@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distance Converter Pro</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: 350px;
+        }
+        h2 { margin-top: 0; color: #1c1e21; font-size: 1.25rem; text-align: center; }
+        label { font-size: 0.85rem; color: #65676b; font-weight: 600; }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 16px 0;
+            border: 1px solid #dddfe2;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-convert { background-color: #007AFF; color: white; }
+        .btn-swap { background-color: #e4e6eb; color: #050505; }
+        button:hover { opacity: 0.8; }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            color: #007AFF;
+            background: #e7f3ff;
+            border-radius: 8px;
+            min-height: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Distance Converter</h2>
+    
+    <label for="inputValue">Value to Convert</label>
+    <input type="number" id="inputValue" placeholder="0.00" step="any">
+    
+    <label for="direction">Direction</label>
+    <select id="direction">
+        <option value="kmToMi">Kilometers (km) to Miles (mi)</option>
+        <option value="miToKm">Miles (mi) to Kilometers (km)</option>
+    </select>
+
+    <div class="button-group">
+        <button class="btn-swap" onclick="swapUnits()">⇅ Swap</button>
+        <button class="btn-convert" onclick="convert()">Convert</button>
+    </div>
+
+    <div id="result">---</div>
+</div>
+
+<script>
+    // Constants for conversion factors
+    const KM_TO_MILE = 0.621371;
+    const MILE_TO_KM = 1.60934;
+
+    function convert() {
+        const input = document.getElementById('inputValue');
+        const val = parseFloat(input.value);
+        const direction = document.getElementById('direction').value;
+        const resultDiv = document.getElementById('result');
+
+        if (isNaN(val)) {
+            resultDiv.innerText = "Enter a number";
+            return;
+        }
+
+        let converted, unit;
+        if (direction === "kmToMi") {
+            converted = val * KM_TO_MILE;
+            unit = "mi";
+        } else {
+            converted = val * MILE_TO_KM;
+            unit = "km";
+        }
+
+        resultDiv.innerText = `${val} ${direction.substring(0,2)} = ${converted.toFixed(3)} ${unit}`;
+    }
+
+    function swapUnits() {
+        const selector = document.getElementById('direction');
+        const resultDiv = document.getElementById('result');
+        const input = document.getElementById('inputValue');
+
+        // 1. Flip the dropdown selection
+        selector.value = (selector.value === "kmToMi") ? "miToKm" : "kmToMi";
+
+        // 2. Logic: If a result exists, move it to the input for a "round-trip"
+        // This is a pro-user move!
+        const currentResultText = resultDiv.innerText;
+        if (currentResultText.includes('=')) {
+            const lastResult = currentResultText.split('=')[1].trim().split(' ')[0];
+            input.value = lastResult;
+        }
+
+        // 3. Re-run the calculation
+        convert();
+    }
+</script>
+
+</body>
+</html>
